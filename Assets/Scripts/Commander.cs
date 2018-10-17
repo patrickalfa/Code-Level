@@ -19,9 +19,13 @@ public class Commander : MonoBehaviour
     public static Commander instance;
 
     public Transform _cursor;
+    public Transform _tilesParent;
 
     [Header("Prefabs")]
     [SerializeField] private GameObject pfGround;
+    [SerializeField] private GameObject pfSpring;
+    [SerializeField] private GameObject pfLaser;
+
 
     /////////////////////////////////////////////////////////
 
@@ -40,15 +44,8 @@ public class Commander : MonoBehaviour
 
     public void Execute(string command, char direction, int length)
     {
-        // Check if direction is valid.
-        if (direction != 'l' && direction != 'r' && direction != 'd' && direction != 'u')
-        {
-            Logger.instance.LogError("Incorrect direction: " + direction + ".");
-            return;
-        }
-
-        // Check negative length
-        if (length < 0)
+        // Check null or negative length
+        if (length < 1)
         {
             Logger.instance.LogError("Invalid value.");
             return;
@@ -62,6 +59,10 @@ public class Commander : MonoBehaviour
             case 'r': dir = Vector3.right; break;
             case 'u': dir = Vector3.up; break;
             case 'd': dir = Vector3.down; break;
+            case '\n': dir = Vector3.zero; break;
+            default:
+                Logger.instance.LogError("Incorrect direction: " + direction + ".");
+                return;
         }
 
         // Check there is space for cursor to move
@@ -77,6 +78,14 @@ public class Commander : MonoBehaviour
         StartCoroutine(command, args);
     }
 
+    private void DestroyTileOnCursor()
+    {
+        Collider2D hit = Physics2D.OverlapCircle(_cursor.position, .25f, LayerMask.GetMask("Tile"));
+
+        if (hit)
+            Destroy(hit.gameObject);
+    }
+
     // COMMANDS /////////////////////////////////////////////
 
     private IEnumerator ground(ARGUMENTS args)
@@ -86,19 +95,72 @@ public class Commander : MonoBehaviour
         {
             yield return new WaitForEndOfFrame();
 
-            Instantiate(pfGround, _cursor.position, Quaternion.identity, transform);
+            DestroyTileOnCursor();
+
+            Instantiate(pfGround, _cursor.position, Quaternion.identity, _tilesParent);
             _cursor.Translate(args.direction);            
         }
     }
 
+    private IEnumerator spring(ARGUMENTS args)
+    {
+        // Build spring
+        yield return new WaitForEndOfFrame();
+
+        DestroyTileOnCursor();
+        Instantiate(pfSpring, _cursor.position, Quaternion.identity, _tilesParent);
+    }
+
+    private IEnumerator laser(ARGUMENTS args)
+    {
+        // Build laser
+        yield return new WaitForEndOfFrame();
+
+        DestroyTileOnCursor();
+        Instantiate(pfLaser, _cursor.position, Quaternion.identity, _tilesParent);
+    }
+
     private IEnumerator move(ARGUMENTS args)
     {
-        // Build ground
+        // Move cursor
         for (int i = 0; i < args.length; i++)
         {
             yield return new WaitForEndOfFrame();
 
             _cursor.Translate(args.direction);
         }
+    }
+
+    private IEnumerator delete(ARGUMENTS args)
+    {
+        // Delete tiles
+        for (int i = 0; i < args.length; i++)
+        {
+            yield return new WaitForEndOfFrame();
+                       
+            DestroyTileOnCursor();
+            _cursor.Translate(args.direction);            
+        }
+    }
+
+    private IEnumerator clear(ARGUMENTS args)
+    {
+        // Clear tiles
+        while (_tilesParent.childCount > 1)
+        {
+            yield return new WaitForEndOfFrame();
+
+            Destroy(_tilesParent.GetChild(0).gameObject);
+        }
+    }
+
+    private IEnumerator reset(ARGUMENTS args)
+    {
+        yield return new WaitForEndOfFrame();
+    }
+
+    private IEnumerator build(ARGUMENTS args)
+    {
+        yield return new WaitForEndOfFrame();
     }
 }

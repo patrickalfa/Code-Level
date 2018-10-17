@@ -2,6 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
+public struct COMMAND
+{
+    public string name;
+    public int minArgs;
+    public int maxArgs;
+}
+
 public class Typer : MonoBehaviour
 {
     public static Typer instance;
@@ -9,7 +17,7 @@ public class Typer : MonoBehaviour
     public string prompt;
     public int maxLength;
     public Sprite[] sprites;
-    public string[] commands;
+    public COMMAND[] commands;
 
     public Transform _cursor;
 
@@ -152,19 +160,22 @@ public class Typer : MonoBehaviour
         MoveCursor(-1);
     }
 
+    private COMMAND? GetCommandByName(string name)
+    {
+        foreach (COMMAND c in commands)
+        {
+            if (c.name == name)
+                return c;
+        }
+
+        return null;
+    }
+
     private void CheckCommand()
     {
         string[] ss = prompt.Split(' ');
 
-        isCommand = false;
-        foreach (string c in commands)
-        {
-            if (ss[0] == (c))
-            {
-                isCommand = true;
-                break;
-            }
-        }
+        isCommand = (GetCommandByName(ss[0]) != null);
 
         for (int i = 0; i < ss[0].Length; i++)
             characters[i].GetComponent<SpriteRenderer>().color = (isCommand ? Color.green : Color.white);
@@ -184,27 +195,29 @@ public class Typer : MonoBehaviour
             Logger.instance.LogError("Unknown command: " + ss[0] + ".");
             return;
         }
-
-        if (ss.Length < 3)
+        else
         {
-            Logger.instance.LogError("Missing arguments.");
-            return;
-        }
-        else if (ss.Length > 3)
-        {
-            Logger.instance.LogError("Invalid syntax.");
-            return;
-        }
+            COMMAND? cmd = GetCommandByName(ss[0]);
 
-        int length = -1;
-        if (!int.TryParse(ss[2], out length))
-        {
-            Logger.instance.LogError("Invalid value.");
-            return;
+            if (ss.Length < cmd.Value.minArgs + 1)
+                Logger.instance.LogError("Missing arguments.");
+            else if (ss.Length > cmd.Value.maxArgs + 1)
+                Logger.instance.LogError("Invalid syntax.");
+            else
+            {
+                int length = 1;
+                if (ss.Length == 3 && (!int.TryParse(ss[2], out length) || ss[1].Length == 0))
+                    Logger.instance.LogError("Invalid value.");
+                else
+                {
+                    char direction = '\n';
+
+                    if (ss.Length > 1)
+                        direction = ss[1][0];
+
+                    Commander.instance.Execute(ss[0], direction, length);
+                }
+            }
         }
-
-        // ------------------------------------------------
-
-        Commander.instance.Execute(ss[0], ss[1][0], length);
     }
 }
