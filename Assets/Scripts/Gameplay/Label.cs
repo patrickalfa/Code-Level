@@ -6,6 +6,7 @@ public class Label : MonoBehaviour
     [TextArea]
     public string text;
     public Color color;
+    public int sortingOrder;
     public Sprite[] _sprites;
 
     private string lateText = "";
@@ -52,6 +53,7 @@ public class Label : MonoBehaviour
         GameObject c = new GameObject(character.ToString());
         c.AddComponent<SpriteRenderer>().sprite = _sprites[(int)character];
         c.GetComponent<SpriteRenderer>().color = color;
+        c.GetComponent<SpriteRenderer>().sortingOrder = sortingOrder;
         c.transform.parent = transform;
         c.transform.localPosition = Vector3.right * index;
 
