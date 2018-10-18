@@ -65,14 +65,6 @@ public class Commander : MonoBehaviour
                 return;
         }
 
-        // Check there is space for cursor to move
-        Vector3 nextCursorPos = _cursor.position + (dir * length);
-        if (Mathf.Abs(nextCursorPos.x) > 12 || Mathf.Abs(nextCursorPos.y) > 6)
-        {
-            Logger.instance.LogMessage("Out of bounds.");
-            return;
-        }
-
         // Execute command
         ARGUMENTS args = new ARGUMENTS(dir, length);
         StartCoroutine(command, args);
@@ -86,6 +78,45 @@ public class Commander : MonoBehaviour
             Destroy(hit.gameObject);
     }
 
+    private bool IsCursorOnLevel()
+    {
+        Collider2D hit = Physics2D.OverlapCircle(_cursor.position, .25f, LayerMask.GetMask("Level"));
+
+        if (hit)
+        {
+            Logger.instance.LogMessage("Cannot override level.");
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool IsMovementOutOfBounds(Vector3 direction)
+    {
+        Vector3 nextPos = _cursor.position + direction;
+
+        if (Mathf.Abs(nextPos.x) > 12 || Mathf.Abs(nextPos.y) > 6)
+        {
+            Logger.instance.LogMessage("Out of bounds.");
+            return true;
+        }
+
+        return false;
+    }
+
+    public void ClearTiles()
+    {
+        foreach (Transform t in _tilesParent)
+            Destroy(t.gameObject);
+    }
+
+    public void ResetTiles()
+    {
+        Laser[] lasers = _tilesParent.GetComponentsInChildren<Laser>(true);
+        foreach (Laser l in lasers)
+            l.Restart();
+    }
+
     // COMMANDS /////////////////////////////////////////////
 
     private IEnumerator ground(ARGUMENTS args)
@@ -95,9 +126,16 @@ public class Commander : MonoBehaviour
         {
             yield return new WaitForEndOfFrame();
 
+            if (IsCursorOnLevel())
+                break;
+
             DestroyTileOnCursor();
 
             Instantiate(pfGround, _cursor.position, Quaternion.identity, _tilesParent);
+
+            if (IsMovementOutOfBounds(args.direction))
+                break;
+
             _cursor.Translate(args.direction);            
         }
     }
@@ -107,8 +145,11 @@ public class Commander : MonoBehaviour
         // Build spring
         yield return new WaitForEndOfFrame();
 
-        DestroyTileOnCursor();
-        Instantiate(pfSpring, _cursor.position, Quaternion.identity, _tilesParent);
+        if (!IsCursorOnLevel())
+        {
+            DestroyTileOnCursor();
+            Instantiate(pfSpring, _cursor.position, Quaternion.identity, _tilesParent);
+        }
     }
 
     private IEnumerator laser(ARGUMENTS args)
@@ -116,8 +157,11 @@ public class Commander : MonoBehaviour
         // Build laser
         yield return new WaitForEndOfFrame();
 
-        DestroyTileOnCursor();
-        Instantiate(pfLaser, _cursor.position, Quaternion.identity, _tilesParent);
+        if (!IsCursorOnLevel())
+        {
+            DestroyTileOnCursor();
+            Instantiate(pfLaser, _cursor.position, Quaternion.identity, _tilesParent);
+        }
     }
 
     private IEnumerator move(ARGUMENTS args)
@@ -126,6 +170,9 @@ public class Commander : MonoBehaviour
         for (int i = 0; i < args.length; i++)
         {
             yield return new WaitForEndOfFrame();
+
+            if (IsMovementOutOfBounds(args.direction))
+                break;
 
             _cursor.Translate(args.direction);
         }
@@ -139,6 +186,10 @@ public class Commander : MonoBehaviour
             yield return new WaitForEndOfFrame();
                        
             DestroyTileOnCursor();
+
+            if (IsMovementOutOfBounds(args.direction))
+                break;
+
             _cursor.Translate(args.direction);            
         }
     }
@@ -157,10 +208,14 @@ public class Commander : MonoBehaviour
     private IEnumerator reset(ARGUMENTS args)
     {
         yield return new WaitForEndOfFrame();
+
+        FindObjectOfType<Version>().Restart();
     }
 
     private IEnumerator build(ARGUMENTS args)
     {
         yield return new WaitForEndOfFrame();
+
+        FindObjectOfType<Bot>().Run();
     }
 }
