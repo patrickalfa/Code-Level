@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
 
     public Version[] _versions;
+    public Label _labelVersion;
 
     private int currentVersion;
 
@@ -33,7 +34,10 @@ public class GameManager : MonoBehaviour
 
         currentVersion++;
         if (currentVersion < _versions.Length)
+        {
             _versions[currentVersion].gameObject.SetActive(true);
+            _labelVersion.text = _versions[currentVersion].name;
+        }
         else
             Debug.Break(); // DEBUG
     }
