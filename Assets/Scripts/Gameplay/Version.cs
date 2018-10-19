@@ -31,5 +31,9 @@ public class Version : MonoBehaviour
             b.Restart();
 
         Commander.instance.ResetTiles();
+
+        Laser[] lasers = GetComponentsInChildren<Laser>(true);
+        foreach (Laser l in lasers)
+            l.Restart();
     }
 }
