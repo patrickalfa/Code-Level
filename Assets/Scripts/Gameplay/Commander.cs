@@ -61,7 +61,7 @@ public class Commander : MonoBehaviour
             case 'd': dir = Vector3.down; break;
             case '\n': dir = Vector3.zero; break;
             default:
-                Logger.instance.LogError("Incorrect direction: " + direction + ".");
+                Logger.instance.LogError("Invalid direction: " + direction + ".");
                 return;
         }
 

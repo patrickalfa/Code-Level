@@ -1,0 +1,32 @@
+-------------------- COMMANDS -------------------------
+
+build                           - start the simulation
+reset                           - reset the simulation
+
+move [direction] [amount]       - move the cursor
+delete [direction] [amount]     - delete tiles
+clear                           - clear all tiles
+
+ground [direction] [amount]     - create ground tiles
+spring                          - create spring tile
+laser                           - create laser tile
+
+-------------------------------------------------------
+
+# [direction]:
+
+    'l' - left
+    'r' - right
+    'u' - up
+    'd' - down
+
+-------------------------------------------------------
+
+# examples:
+
+    move r
+    move u 3
+    ground
+    ground l 5
+    delete
+    delete d 2

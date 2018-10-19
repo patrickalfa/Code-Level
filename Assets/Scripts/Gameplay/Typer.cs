@@ -183,6 +183,7 @@ public class Typer : MonoBehaviour
 
     private void CheckBash()
     {
+        prompt = prompt.TrimEnd(' ');
         lastPrompt = prompt;
         string[] ss = prompt.Split(' ');
 
@@ -213,7 +214,15 @@ public class Typer : MonoBehaviour
                     char direction = '\n';
 
                     if (ss.Length > 1)
+                    {
+                        if (ss[1].Length > 1)
+                        {
+                            Logger.instance.LogError("Invalid direction: " + ss[1] + ".");
+                            return;
+                        }
+
                         direction = ss[1][0];
+                    }
 
                     Commander.instance.Execute(ss[0], direction, length);
                 }
