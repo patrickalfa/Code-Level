@@ -2957,7 +2957,7 @@ MonoBehaviour:
   _bot: {fileID: 114302921246877582}
   _bugs:
   - {fileID: 114664333468361322}
-  fixes: 1
+  fixes: 0
 --- !u!212 &212020637639935906
 SpriteRenderer:
   m_ObjectHideFlags: 1
