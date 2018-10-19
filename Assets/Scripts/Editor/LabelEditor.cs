@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿#if UNITY_EDITOR
+
+using System.Collections;
 using UnityEngine;
 using UnityEditor;
 
@@ -14,3 +16,5 @@ public class ObjectBuilderEditor : Editor
             label.UpdateText();
     }
 }
+
+#endif
