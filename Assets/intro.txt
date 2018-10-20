@@ -1,5 +1,0 @@
-hi, welcome to code-level. in this game
-you'll play as a programmer, coding the
-way to the solution of each level and in
-the process, fixing some bugs until you've
-reached that much desired v1.0 release.

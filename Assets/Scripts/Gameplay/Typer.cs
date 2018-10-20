@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,6 +19,7 @@ public class Typer : MonoBehaviour
     public int maxLength;
     public Sprite[] sprites;
     public COMMAND[] commands;
+    public int sortingOrder;
 
     public Transform _cursor;
 
@@ -105,7 +107,7 @@ public class Typer : MonoBehaviour
             return;
 
         if (Input.inputString[0] == 8) // BACKSPACE
-            DeleteCharacter();
+            DeleteLeftCharacter();
         else if (Input.inputString[0] == 13) // ENTER
             CheckBash();
         else
@@ -132,6 +134,7 @@ public class Typer : MonoBehaviour
 
         GameObject c = new GameObject(s);
         c.AddComponent<SpriteRenderer>().sprite = sprites[(int)character];
+        c.GetComponent<SpriteRenderer>().sortingOrder = sortingOrder;
         c.transform.parent = transform;
         c.transform.position = _cursor.position;
         characters.Add(c);
@@ -139,7 +142,7 @@ public class Typer : MonoBehaviour
         MoveCursor(1);
     }
 
-    private void DeleteCharacter()
+    private void DeleteLeftCharacter()
     {
         if (prompt.Length <= 0 || index < 1)
             return;
@@ -158,6 +161,25 @@ public class Typer : MonoBehaviour
         }
 
         MoveCursor(-1);
+    }
+
+    private void DeleteRightCharacter()
+    {
+        if (prompt.Length <= 0 || index == (prompt.Length - 1))
+            return;
+
+        int lastIndex = index;
+        GameObject last = characters[lastIndex];
+
+        prompt = prompt.Remove(lastIndex, 1);
+        characters.RemoveAt(lastIndex);
+        Destroy(last);
+
+        if (index < (prompt.Length + 1))
+        {
+            UpdatePrompt(prompt);
+            index = lastIndex + 1;
+        }
     }
 
     private COMMAND? GetCommandByName(string name)

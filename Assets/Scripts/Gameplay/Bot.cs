@@ -10,6 +10,7 @@ public class Bot : MonoBehaviour
 
     private Transform _trf;
     private Rigidbody2D _rgbd;
+    private Collider2D _col;
     private Vector3 _startingPosition;
 
     /////////////////////////////////////////////////////////
@@ -18,6 +19,7 @@ public class Bot : MonoBehaviour
     {
         _trf = transform;
         _rgbd = GetComponent<Rigidbody2D>();
+        _col = GetComponent<Collider2D>();
         _rgbd.simulated = false;
         _startingPosition = _trf.position;
         running = false;
@@ -58,12 +60,17 @@ public class Bot : MonoBehaviour
         vel.y = 0;
         _rgbd.velocity = vel;
         _rgbd.AddForce(Vector2.up * impulse, ForceMode2D.Impulse);
+
+        SoundManager.PlaySound("spring", false, .6f);
     }
 
     public void Restart()
     {
         running = false;
         _rgbd.simulated = false;
+        _col.enabled = true;
         _trf.position = _startingPosition;
+        _trf.localScale = Vector3.one;
+        _trf.rotation = Quaternion.identity;
     }
 }

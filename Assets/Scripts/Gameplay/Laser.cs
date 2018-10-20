@@ -46,6 +46,8 @@ public class Laser : MonoBehaviour
         fired = true;
         direction = dir;
         _trf.localScale = new Vector3(1f, .25f, 1f);
+
+        SoundManager.PlaySound("laser");
     }
 
     public void Restart()

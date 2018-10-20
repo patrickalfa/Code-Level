@@ -136,7 +136,9 @@ public class Commander : MonoBehaviour
             if (IsMovementOutOfBounds(args.direction))
                 break;
 
-            _cursor.Translate(args.direction);            
+            _cursor.Translate(args.direction);
+
+            SoundManager.PlaySound("tile");
         }
     }
 
@@ -150,6 +152,8 @@ public class Commander : MonoBehaviour
             DestroyTileOnCursor();
             Instantiate(pfSpring, _cursor.position, Quaternion.identity, _tilesParent);
         }
+
+        SoundManager.PlaySound("tile");
     }
 
     private IEnumerator laser(ARGUMENTS args)
@@ -162,6 +166,8 @@ public class Commander : MonoBehaviour
             DestroyTileOnCursor();
             Instantiate(pfLaser, _cursor.position, Quaternion.identity, _tilesParent);
         }
+
+        SoundManager.PlaySound("tile");
     }
 
     private IEnumerator move(ARGUMENTS args)
@@ -176,6 +182,8 @@ public class Commander : MonoBehaviour
 
             _cursor.Translate(args.direction);
         }
+
+        SoundManager.PlaySound("button");
     }
 
     private IEnumerator delete(ARGUMENTS args)
@@ -192,6 +200,8 @@ public class Commander : MonoBehaviour
 
             _cursor.Translate(args.direction);            
         }
+
+        SoundManager.PlaySound("bug");
     }
 
     private IEnumerator clear(ARGUMENTS args)
@@ -203,19 +213,41 @@ public class Commander : MonoBehaviour
 
             Destroy(_tilesParent.GetChild(0).gameObject);
         }
+
+        GameManager.instance.FreezeFrame(.1f);
+        GameManager.instance.ScreenShake(.1f, 1f, 50);
+
+        SoundManager.PlaySound("clear");
     }
 
     private IEnumerator reset(ARGUMENTS args)
     {
         yield return new WaitForEndOfFrame();
 
+        GameManager.instance.FreezeFrame(.1f);
+        GameManager.instance.ScreenShake(.1f, 1f, 50);
+
         FindObjectOfType<Version>().Restart();
+
+        SoundManager.PlaySound("reset");
     }
 
     private IEnumerator build(ARGUMENTS args)
     {
         yield return new WaitForEndOfFrame();
 
+        GameManager.instance.FreezeFrame(.1f);
+        GameManager.instance.ScreenShake(.1f, 1f, 50);
+
         FindObjectOfType<Bot>().Run();
+
+        SoundManager.PlaySound("build");
+    }
+
+    private IEnumerator quit(ARGUMENTS args)
+    {
+        yield return new WaitForEndOfFrame();
+
+        Application.Quit();
     }
 }

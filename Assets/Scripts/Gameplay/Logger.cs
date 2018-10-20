@@ -7,6 +7,7 @@ public class Logger : MonoBehaviour
     public static Logger instance;
 
     public Transform _cursor;
+    public int sortingOrder;
 
     private List<GameObject> characters;
 
@@ -63,6 +64,7 @@ public class Logger : MonoBehaviour
         GameObject c = new GameObject(character.ToString());
         c.AddComponent<SpriteRenderer>().sprite = Typer.instance.sprites[(int)character];
         c.GetComponent<SpriteRenderer>().color = color;
+        c.GetComponent<SpriteRenderer>().sortingOrder = sortingOrder;
         c.transform.parent = transform;
         c.transform.position = _cursor.position;
         characters.Add(c);

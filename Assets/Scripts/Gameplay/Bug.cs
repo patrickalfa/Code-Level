@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class Bug : MonoBehaviour
 {
@@ -19,13 +20,22 @@ public class Bug : MonoBehaviour
 
     public void Fix()
     {
-        gameObject.SetActive(false);
-        FindObjectOfType<Version>().fixes++;
+        GetComponent<Collider2D>().enabled = false;
+
+        GameManager.instance.FreezeFrame(.15f);
+        _trf.DOShakePosition(.15f, 1f, 50).SetUpdate(true).OnComplete(() =>
+        {
+            gameObject.SetActive(false);
+            FindObjectOfType<Version>().fixes++;
+        });
+
+        SoundManager.PlaySound("bug");
     }
 
     public void Restart()
     {
         _trf.position = _startingPosition;
         gameObject.SetActive(true);
+        GetComponent<Collider2D>().enabled = true;
     }
 }
