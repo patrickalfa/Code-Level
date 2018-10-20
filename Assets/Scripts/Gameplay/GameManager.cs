@@ -45,6 +45,9 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        if (Application.platform == RuntimePlatform.WindowsPlayer)
+            Cursor.visible = false;
+
         lateState = currentState;
         currentVersion = 0;
     }
